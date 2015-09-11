@@ -1,0 +1,12 @@
+{
+"name": "codetest-api" "
+ "version": "1.0.0",
+ "dependencies": {
+	 "mongoose": "~3.6.11",
+	 "express": "^4.7.1",
+	 "bodyparser": "^1.5.1", 
+	 "jsonwebtoken": "^5", 
+	 "morgan": "^1.6", 
+	 "nodemon": "^1.4"  	
+	}
+}
