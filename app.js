@@ -21,15 +21,13 @@ app.use(morgan('dev'));
 // Models **** 
 //************ 
 
-var citizenBirthModel = require('./models/CitizenBirth.js'); 
-var citizenDeadModel = require('./models/CitizenDead.js'); 
+var citizenModel = require('./models/Citizen.js'); 
 
 //**************
 // Controllers **
 //***************   
 
-var citizenBirthCtrl = require('./controllers/CitizenBirth.js'); 
-var citizenDeadCtrl = require('./controllers/CitizenDead.js'); 
+var citizenCtrl = require('./controllers/Citizen.js'); 
 
 //************
 // Routes ****  
@@ -38,7 +36,7 @@ var defaultRouter = express.Router();
 var apiRouter = express.Router(); 
 
 defaultRouter.route('/') 
-	.get(function( req , res ) { res.json( {message : 'No api here, try /api instead'} )}); 
+	.get(function( req , res ) { res.json( {message : 'No api here, try \'/api\' instead'} )}); 
 
 apiRouter.route('/') 
 	.get(function( req, res ) {res.json( {message : 'Hi! api running on localhost: ' + port + '/'} ) });

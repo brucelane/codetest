@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'); 
 
-var citizenBirthSchema = new mongoose.Schema({
+var citizenSchema = new mongoose.Schema({
 	 name: {type: String}
 	,key: {type: String}
 	,secret: {type: String} 
@@ -8,4 +8,4 @@ var citizenBirthSchema = new mongoose.Schema({
 	,birth: {type: Date}
 });
  
-module.exports = mongoose.model( 'CitizenBirth' , citizenBirthSchema ); 
+module.exports = mongoose.model( 'Citizen' , citizenSchema ); 
