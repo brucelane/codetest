@@ -1,7 +1,6 @@
 var mongoose = require('mongoose'); 
-	Schema = mongooser.Schema; 
 
-var freeIdSchema = new Schema({
+var freeIdSchema = new mongoose.Schema({
 	key: {type: String}
 }); 
 

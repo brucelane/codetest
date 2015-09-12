@@ -18,18 +18,6 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 //************
-// Models **** 
-//************ 
-
-var citizenModel = require('./models/Citizen.js'); 
-
-//**************
-// Controllers **
-//***************   
-
-var citizenCtrl = require('./controllers/Citizen.js'); 
-
-//************
 // Routes ****  
 //************
 

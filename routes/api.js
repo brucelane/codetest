@@ -26,11 +26,22 @@ module.exports = function apiRouter( app ) {
 			});  
 		})
 		.post(function( req , res ) {
-			citizenCtrl.addCitizen(function( err , key) { 
+			var citizenData = new citizenModel({
+				 name : req.body.name
+				,key : req.body.key
+				,secret : req.body.secret
+				,sex : req.body.sex
+				,birth : req.body.birth 
+			}); 
+			citizenCtrl.addCitizen( citizenData , function( err , key) { 
+				if (err) res.status( 500 , err ); 
+				res.status(200).json( key );  
 			})
 		})   
 		.delete(function ( req , res ) {
-			citizenCtrl.delCitizen(function ( err , key ) {
+			citizenCtrl.delCitizen( req.body.key , function ( err , removedCitizens ) {
+				if (err) res.status( 500 , err ); 
+				res.status(200).json( { result : removedCitizens } );  
 			}); 
 		}); 
 

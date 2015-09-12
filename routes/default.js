@@ -19,5 +19,5 @@ module.exports = function defaultRouter( app ) {
 	//************ 
 	// Init ****** 
 	//************ 
-	app.use('/', defaultRouter); 
+	app.use('/', defaultRouter);  
 }; 

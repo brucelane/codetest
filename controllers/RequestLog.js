@@ -1,10 +1,28 @@
+//****************
+// Dependencies***
+//**************** 
+
 var mongoose = require('mongoose'); 
-	Schema = mongoose.Schema; 
+var requestLog = mongoose.model('RequestLog');
 
-var requestLogSchema = new Schema({
-	 request: {type: String}
-	,type: {type: String}
-	,ip: {type: String} 
-});  
+//************************** 
+// Business Logic **********
+//************************** 
 
-module.exports = mongoose.model( 'RequestLog' , requestLogSchema ); 
+var requestsFindAll = function( cb ) {
+	requestLog.find( function ( err , requests ) {
+		if (err) cb(err, null); 
+		cb(null, requests);   
+	}); 	
+}; 
+
+var requestAdd = function(requestLogData, cb ) {
+	requestLogData.save( function ( err , log ) {
+		if (err) cb(err, null); 
+		cb(null, log); 	
+	}); 
+};
+
+
+module.exports = { getLogs : requestsFindAll , addLog : requestAdd }; 
+
