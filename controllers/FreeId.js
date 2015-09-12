@@ -2,6 +2,7 @@
 // Dependencies***
 //**************** 
 
+var uuidGenerator = require('uuid-lib'); 
 var mongoose = require('mongoose'); 
 var freeIdModel = require('../models/FreeId.js'); 
 var freeId = mongoose.model('FreeId');
@@ -18,10 +19,26 @@ var freeIdsFindAll = function( cb ) {
 }; 
 
 
-var freeIdDelete = function(id, cb ) {
-	freeId.remove({ key : id }, function(err , removedDocs) {
+var freeIdAdd = function ( key , cb ) {
+	var freeIdDataModel = new freeIdModel({ 'key' : key }); 
+	freeIdDataModel.save(function(err, newKey) {
 		if (err) return cb(err, null); 
-		cb(null, removedDocs); 
+		cb(null, newKey); 
+	}); 
+}; 
+
+var freeIdAddOne = function ( cb ) {
+	var freeIdDataModel = new freeIdModel({ 'key' : uuidGenerator.raw() }); 
+	freeIdDataModel.save(function(err, newKey) { 
+		if (err) return cb(err, null); 
+		cb(null, newKey); 
+	}); 
+}; 
+
+var freeIdDelete = function(key, cb ) {
+	freeId.remove({ 'key' : key }, function(err , removedKey) {
+		if (err) return cb(err, null); 
+		cb(null, removedKey); 
 	}); 
 }; 
 
@@ -32,5 +49,5 @@ var freeIdGetOne = function(cb) {
 	}); 
 }; 
 
-module.exports = { getIds : freeIdsFindAll , delFreeId : freeIdDelete , getFreeId : freeIdGetOne }; 
+module.exports = { getIds : freeIdsFindAll , enQueue : freeIdAdd ,  generateNewId : freeIdAddOne , delFreeIdByKey : freeIdDelete , deQueue : freeIdGetOne }; 
  
