@@ -32,17 +32,8 @@ var citizenCtrl = require('./controllers/Citizen.js');
 //************
 // Routes ****  
 //************
-var defaultRouter = express.Router(); 
-var apiRouter = express.Router(); 
 
-defaultRouter.route('/') 
-	.get(function( req , res ) { res.json( {message : 'No api here, try \'/api\' instead'} )}); 
-
-apiRouter.route('/') 
-	.get(function( req, res ) {res.json( {message : 'Hi! api running on localhost: ' + port + '/'} ) });
-
-app.use('/', defaultRouter);
-app.use('/api', apiRouter); 
+require('./routes/routes.js')( app ); 
 
 app.listen(port); 
 console.log('app initialized'); 

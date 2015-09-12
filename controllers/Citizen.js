@@ -8,4 +8,4 @@ var findAllCitizens = function(req, res) {
 	}); 	
 }; 
 
-module.exports = { getCitizens : findAllCitizen };  
+module.exports = { getCitizens : findAllCitizens };  
