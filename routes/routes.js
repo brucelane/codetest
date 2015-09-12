@@ -3,14 +3,13 @@ module.exports = function( app ) {
 	//*****************
 	// Dependencies ***
 	//***************** 	
-	var logRequestModel = require('../models/RequestLog.js'); 
 	var logRequestCtrl = require('../controllers/RequestLog.js');
  	
 	//**************** 
 	// Middleware **** 
 	//**************** 
  	app.all('*', function( req , res , next ) {
-		var logRequest = new logRequestModel({
+		var logRequest = new Object({
 			 request : req.toString()
 			,type : req.method
 			,ip : req.ip 

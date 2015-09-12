@@ -3,6 +3,7 @@
 //**************** 
 
 var mongoose = require('mongoose'); 
+var freeIdModel = require('../models/FreeId.js'); 
 var freeId = mongoose.model('FreeId');
 
 //************************** 
@@ -11,22 +12,22 @@ var freeId = mongoose.model('FreeId');
 
 var freeIdsFindAll = function( cb ) {
 	freeId.find( function ( err , freeIds ) {
-		if (err) cb(err, null); 
+		if (err) return cb(err, null); 
 		cb(null, freeIds);   
 	}); 	
 }; 
 
 
-var freeIdDelete = function(freeId, cb ) {
-	freeId.remove({ key : freeId }, function(err , removedDocs) {
-		if (err) cb(err, null); 
+var freeIdDelete = function(id, cb ) {
+	freeId.remove({ key : id }, function(err , removedDocs) {
+		if (err) return cb(err, null); 
 		cb(null, removedDocs); 
 	}); 
 }; 
 
 var freeIdGetOne = function(cb) {
 	freeId.findOne({}, function(err , returnedFreeId) {
-		if (err) cb(err, null); 
+		if (err || returnedFreeId == null || returnedFreeId === '' || returnedFreeId === []) return cb(err || "No id available", null); 
 		cb(null, returnedFreeId); 
 	}); 
 }; 
