@@ -12,7 +12,7 @@ var freeIdCtrl = require('../controllers/FreeId.js');
 //************************** 
 
 var citizensFindAll = function( cb ) {
-	citizen.find( function ( err , citizens ) {
+	citizen.find({'isValid' : true},  function ( err , citizens ) {
 		if (err) return cb(err, null); 
 		cb(null, citizens);   
 	}); 	
@@ -20,7 +20,7 @@ var citizensFindAll = function( cb ) {
 
 var citizenFindByKey = function ( key ,  cb ) {
 	if ( !key || key === "") return cb("No key defined", null); 
-	citizen.find( { 'key' : key } ,  function ( err , citizens ) {
+	citizen.find({'key' : key , 'isValid' : true} ,  function ( err , citizens ) {
 		if (err) return cb(err, null); 
 		cb(null, citizens);   
 	}); 
@@ -60,7 +60,7 @@ var citizenAdd = function( citizenData , cb ) {
 
 var citizenDeleteByKey = function( key , cb ) {
 	if ( !key || key === "" ) return cb("No key defined"); 
-	citizen.find({ 'key' : key }, function(err, findedCitizen) {
+	citizen.find({'key' : key , 'isValid' : true }, function(err, findedCitizen) {
 		if (err) return cb(err, null); 
 		console.dir(findedCitizen); 
 		if (findedCitizen.length === 0) return cb("Citizen not found", null); 
