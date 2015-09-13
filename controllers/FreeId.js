@@ -46,7 +46,7 @@ var freeIdGetOne = function(cb) {
 	// console.dir(freeId);
 	// console.dir(cb);  
 	freeId.findOne({}, function(err , returnedFreeId) {
-		if (err || returnedFreeId == null || returnedFreeId === '' || returnedFreeId === []) return cb(err || "No id available", null); 
+		if (err || returnedFreeId == null || returnedFreeId === '' || returnedFreeId === []) return cb(err || new Error("No id available"), null); 
 		cb(null, returnedFreeId); 
 	}); 
 }; 
