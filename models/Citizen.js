@@ -6,6 +6,7 @@ var citizenSchema = new mongoose.Schema({
 	,secret: {type: String} 
 	,sex: {type: String}
 	,birth: {type: Date}
+	,isValid : {type: Boolean} 
 });
  
 module.exports = mongoose.model( 'Citizen' , citizenSchema ); 

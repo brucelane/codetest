@@ -26,6 +26,12 @@ var citizenFindByKey = function ( key ,  cb ) {
 	}); 
 }; 
 
+//**************************************************************************
+// Action: Add a new birth to db 					****
+// Restrictions: 							****
+// 	- Citizen key must be one of the existing keys			****
+// 	- Until key is not deleted from collection, user is invalid	****
+//**************************************************************************
 var citizenAdd = function( citizenData , cb ) { 
 	if ( !citizenData || citizenData === {} ) return cb("No data defined"); 
 	var freeId = freeIdCtrl.deQueue(function(err, id) {
@@ -36,14 +42,18 @@ var citizenAdd = function( citizenData , cb ) {
 			,sex : citizenData.sex
 			,birth : citizenData.birth
 			,key : id.key
+			,isValid : false 
 		}); 
 		// check object before insert 
 		citizenDataModel.save( function ( err , citizen ) {
 			if (err) return cb(err, null); 
 			freeIdCtrl.delFreeIdByKey(id.key, function(err, removedIds){
 				if (err) return cb(err, null); 
-				cb(null, citizen); 
-			}); 	
+				citizenDataModel.update( {key : id.key}, {isValid : true}, function(err, updatedCitizen){
+					if (err) cb(err, null); 
+					cb(null, citizen); 
+				}); 
+			});	
 		}); 
 	}); 
 };
