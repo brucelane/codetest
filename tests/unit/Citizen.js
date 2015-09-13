@@ -3,9 +3,9 @@
 //****************** 
 var should = require('should'); 
 var mongoose = require('mongoose'); 
-var citizenCtrl = require('../controllers/Citizen.js'); 
+var citizenCtrl = require('../../controllers/Citizen.js'); 
 var citizenModel = mongoose.model('Citizen'); 
-var config = require('../config/config.js'); 
+var config = require('../../config/config.js'); 
 mongoose.connect(config.db_connection); 
 
 //******************* 
