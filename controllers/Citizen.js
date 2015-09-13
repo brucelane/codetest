@@ -19,10 +19,10 @@ var citizensFindAll = function( cb ) {
 }; 
 
 var citizenFindByKey = function ( key ,  cb ) {
-	if ( !key || key === "") return cb("No key defined", null); 
-	citizen.find({'key' : key , 'isValid' : true} ,  function ( err , citizens ) {
+	if ( !key || key === "") return cb(new Error("No key defined"), null); 
+	 citizen.findOne({'key' : key , 'isValid' : true} ,  function ( err , firstCitizenFinded ) {
 		if (err) return cb(err, null); 
-		cb(null, citizens);   
+		cb(null, firstCitizenFinded);   
 	}); 
 }; 
 
@@ -59,11 +59,10 @@ var citizenAdd = function( citizenData , cb ) {
 };
 
 var citizenDeleteByKey = function( key , cb ) {
-	if ( !key || key === "" ) return cb("No key defined"); 
-	citizen.find({'key' : key , 'isValid' : true }, function(err, findedCitizen) {
+	if ( !key || key === "" ) return cb(new Error("No key defined"), null); 
+	citizen.findOne({'key' : key , 'isValid' : true }, function(err, findedCitizen) {
 		if (err) return cb(err, null); 
-		console.dir(findedCitizen); 
-		if (findedCitizen.length === 0) return cb("Citizen not found", null); 
+		if (findedCitizen == null) return cb(new Error("Citizen not found"), null); 
 		citizen.remove({ 'key' : key }, function(err , removedDocs) {
 			if (err) cb(err, null);
 			freeIdCtrl.enQueue(key, function(err, queuedId){
