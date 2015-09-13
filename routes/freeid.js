@@ -31,7 +31,15 @@ module.exports = function apiRouter( app ) {
  
 			}); 
 		}); 
+ 	defaultRouter.route('/delete') 
+		.delete(function( req , res ) {
+			freeIdCtrl.delFreeIdByKey(req.body.key, function( err , ids) { 
+				if (err) return res.status(500).json( {error : err} );
+				res.status(200).json( { result : ids } );  
  
+			}); 
+		}); 
+
 	//************ 
 	// Init ****** 
 	//************ 
