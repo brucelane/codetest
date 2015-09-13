@@ -61,7 +61,10 @@ describe('Citizen births', function() {
 		it('Should not add citizen birth when free id available and citizen data is not format compliant', function(done) {
 			// Try date as other format 
 			done(new Error("")); 
-		}); 
+		});
+		it('Should handle really big format fields', function(done) {
+			done(new Error("")); 
+		});  
 
 	});   
 }); 
