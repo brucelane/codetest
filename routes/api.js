@@ -19,11 +19,29 @@ module.exports = function apiRouter( app ) {
 		.get(function( req , res ) { res.json( {message : 'Welcome to our api!'} ) }); 
 	defaultRouter.route('/authenticate')
 		.post(function( req , res) {
-			authCtrl.tryToSignUser(function(err, token) {
-				if (err) return res.status(500).json( {error : err} ); 
+			var user = req.params.user || req.query.user; 
+			var passwd = req.params.passwd || req.query.passwd; 
+			authCtrl.tryToSignUser(user, passwd, function(err, token) {
+				if (err) return res.status(500).json( {error : err.message} ); 
 				res.status(200).json(token); 	
 			}); 
 		 }); 
+	defaultRouter.use(function(req, res) {
+		var token = req.params.token || req.query.token || req.header['x-access-token']; 
+		if (token) {
+			console.log(1);
+			authCtrl.validateUserToken(token, function(err, token) {
+				if (err) return res.status(500).json( {error : err.message} ); 
+				res.status(200).json(token); 	
+			});  
+			next(); 
+		} else {
+			res.status(403).json({
+				success : false 
+				,message : 'No token provided' 
+			}); 
+		}	
+	}); 
 	defaultRouter.route('/citizens') 
 		.get(function( req , res ) {
 			citizenCtrl.getCitizens(function( err , citizens ) {
