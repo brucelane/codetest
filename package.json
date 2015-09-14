@@ -11,7 +11,8 @@
 	 ,"nodemon": "^1.4" 
 	 ,"uuid-lib" : "^0.0.6"
 	 ,"mocha" : "^2.3.2" 
-	 ,"should" : "^7.1.0"		
+	 ,"should" : "^7.1.0"
+	 ,"nock" : "^2.11.0" 		
 	}
 ,"scripts" : {
 	"test" : "node_modules/.bin/mocha -A ./tests/unit && node_modules/.bin/mocha -A ./tests/functional"

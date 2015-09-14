@@ -24,7 +24,7 @@ var authenticateUser = function(user , passwd , cb) {
 var validateToken = function (token, cb) {
 	jsonwtk.verify(token, config.authkey, function(err, decodedToken) {
 		if (err) return cb(err, null); 
-		cb(null, decodedToken); 
+		cb(null, (decodedToken === config.authkey)); 
 	}); 
 }; 
 
