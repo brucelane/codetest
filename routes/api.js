@@ -5,6 +5,7 @@ module.exports = function apiRouter( app ) {
 	//**************** 
 	var express = require('express'); 
 	var citizenCtrl = require('../controllers/Citizen.js');
+	var authCtrl = require('../controllers/Auth.js'); 
 	
 	//************
 	// Router App* 
@@ -16,7 +17,13 @@ module.exports = function apiRouter( app ) {
 	//************  
 	defaultRouter.route('/') 
 		.get(function( req , res ) { res.json( {message : 'Welcome to our api!'} ) }); 
-
+	defaultRouter.route('/authenticate')
+		.post(function( req , res) {
+			authCtrl.tryToSignUser(function(err, token) {
+				if (err) return res.status(500).json( {error : err} ); 
+				res.status(200).json(token); 	
+			}); 
+		 }); 
 	defaultRouter.route('/citizens') 
 		.get(function( req , res ) {
 			citizenCtrl.getCitizens(function( err , citizens ) {

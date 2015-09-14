@@ -7,12 +7,19 @@ var citizenCtrl = require('../../controllers/Citizen.js');
 var freeIdCtrl = require('../../controllers/FreeId.js'); 
 var citizenModel = mongoose.model('Citizen'); 
 var config = require('../../config/config.js'); 
-mongoose.connect(config.db_connection); 
 
 //******************* 
 // Test cases ******* 
 //******************* 
 describe('Citizen births', function() {
+	before(function(done) {
+		mongoose.connect(config.db_connection); 
+		done(); 
+	}); 
+	after(function(done) {
+		mongoose.disconnect(); 
+		done(); 
+	}); 
 	describe('Add citizen birth when no setup loaded' , function() {
 		it('Should return an empty array of citizen births when retrieving all citizen births', function(done) {
 			citizenCtrl.getCitizens(function(err, citizens) {

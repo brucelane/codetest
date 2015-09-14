@@ -14,6 +14,6 @@
 	 ,"should" : "^7.1.0"		
 	}
 ,"scripts" : {
-	"test" : "node_modules/.bin/mocha -A ./tests/unit"
+	"test" : "node_modules/.bin/mocha -A ./tests/unit && node_modules/.bin/mocha -A ./tests/functional"
 	} 
 }
