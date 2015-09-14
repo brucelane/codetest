@@ -11,16 +11,23 @@ var freeIdCtrl = require('../controllers/FreeId.js');
 // Business Logic **********
 //************************** 
 
-var citizensFindAll = function( cb ) {
-	citizen.find({'isValid' : true},  function ( err , citizens ) {
+/* var citizensFindAll = function( cb ) {
+	citizen.find({'isValid' : true} , function ( err , citizens ) {
 		if (err) return cb(err, null); 
 		cb(null, citizens);   
+	}).lean(); 	
+}; */ 
+
+var citizensFindAll = function( cb ) {
+	citizen.find({'isValid' : true}).lean().exec(function(err, docs){
+		if(err) return cb(err, null); 
+		cb(null, docs); 
 	}); 	
 }; 
 
 var citizenFindByKey = function ( key ,  cb ) {
 	if ( !key || key === "") return cb(new Error("No key defined"), null); 
-	 citizen.findOne({'key' : key , 'isValid' : true} ,  function ( err , firstCitizenFinded ) {
+	 citizen.findOne({'key' : key , 'isValid' : true}).lean().exec(function ( err , firstCitizenFinded ) {
 		if (err) return cb(err, null); 
 		cb(null, firstCitizenFinded);   
 	}); 
@@ -49,9 +56,9 @@ var citizenAdd = function( citizenData , cb ) {
 			if (err) return cb(err, null); 
 			freeIdCtrl.delFreeIdByKey(id.key, function(err, removedIds){
 				if (err) return cb(err, null); 
-				citizenDataModel.update( {key : id.key}, {isValid : true}, function(err, updatedCitizen){
+				citizen.update( {'isValid' : true}, null,  function(err, updatedCitizen){
 					if (err) cb(err, null); 
-					cb(null, citizen); 
+					cb(null, updatedCitizen); 
 				}); 
 			});	
 		}); 
@@ -73,5 +80,12 @@ var citizenDeleteByKey = function( key , cb ) {
 	}); 
 }; 
 
-module.exports = { getCitizens : citizensFindAll , getCitizen : citizenFindByKey , addCitizen : citizenAdd , delCitizen : citizenDeleteByKey }; 
+var citizenDeleteAll = function( cb ) {
+	citizen.remove({}, function(err, removedCitizens) {
+		if (err) return cb(err, null);  
+		cb(null, removedCitizens); 
+	}); 
+}; 
+
+module.exports = { getCitizens : citizensFindAll , getCitizen : citizenFindByKey , addCitizen : citizenAdd , delCitizen : citizenDeleteByKey , deleteAll : citizenDeleteAll }; 
  

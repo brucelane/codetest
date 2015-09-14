@@ -36,9 +36,16 @@ var freeIdAddOne = function ( cb ) {
 }; 
 
 var freeIdDelete = function(key, cb ) {
-	freeId.remove({ 'key' : key }, function(err , removedKey) {
+	freeId.remove({ 'key' : key }, function(err , totalRemovedKey) {
 		if (err) return cb(err, null); 
-		cb(null, removedKey); 
+		cb(null, totalRemovedKey); 
+	}); 
+}; 
+
+var freeIdDeleteAll = function( cb ) {
+	freeId.remove({}, function(err, removedKeys) {
+		if (err) return cb(err, null); 
+		cb(null, removedKeys); 
 	}); 
 }; 
 
@@ -51,5 +58,5 @@ var freeIdGetOne = function(cb) {
 	}); 
 }; 
 
-module.exports = { getIds : freeIdsFindAll , enQueue : freeIdAdd ,  generateNewId : freeIdAddOne , delFreeIdByKey : freeIdDelete , deQueue : freeIdGetOne }; 
+module.exports = { getIds : freeIdsFindAll , enQueue : freeIdAdd ,  generateNewId : freeIdAddOne , delFreeIdByKey : freeIdDelete , delAllFreeIdKeys : freeIdDeleteAll , deQueue : freeIdGetOne }; 
  
