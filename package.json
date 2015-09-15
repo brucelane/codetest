@@ -15,6 +15,9 @@
 	 ,"supertest" : "^1.1.0" 		
 	}
 ,"scripts" : {
-	"test" : "node_modules/.bin/mocha -A ./tests/unit && node_modules/.bin/mocha -A ./tests/functional"
+	"scripts":{
+        	"start":"node ./app.js"
+    	}
+	,"test" : "node_modules/.bin/mocha -A ./tests/unit && node_modules/.bin/mocha -A ./tests/functional"
 	} 
 }
