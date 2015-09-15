@@ -21,13 +21,19 @@ module.exports = function apiRouter( app ) {
 		.post(function( req , res) {
 			var user = req.body.user ||req.params.user || req.query.user; 
 			var passwd = req.body.passwd || req.params.passwd || req.query.passwd;
-			authCtrl.tryToSignUser(user, passwd, function(err, token) {
-				if (err) return res.status(500).json( err.message ); 
-				res.status(200).json(token); 	
-			}); 
+			if (!user || !passwd) 
+				res.status(403).json({
+					success : false 
+					,message : 'No user data provided' 
+				}); 
+			else 
+				authCtrl.tryToSignUser(user, passwd, function(err, token) {
+					if (err) return res.status(500).json( err.message ); 
+					res.status(200).json(token); 	
+				}); 
 		 }); 
 	 defaultRouter.use(function(req, res, next) {
-		var token = req.body.token || req.params.token || req.query.token || req.header['x-access-token']; 
+		var token = req.body.token || req.params.token || req.query.token || req.header('x-access-token'); 
 		if (token) {
 			authCtrl.validateUserToken(token, function(err, token) {
 				if (err) return res.status(500).json( err ); 
@@ -49,7 +55,7 @@ module.exports = function apiRouter( app ) {
 		}); 
 	defaultRouter.route('/citizen') 
 		.get(function( req , res ) {
-			citizenCtrl.getCitizen(req.param.key , function( err , citizen ) {
+			citizenCtrl.getCitizen(req.body.key , function( err , citizen ) {
 				if (err) return res.status(500).json( err ); 
 				res.status(200).json( citizen );
 			});    
