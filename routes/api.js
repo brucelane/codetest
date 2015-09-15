@@ -19,40 +19,38 @@ module.exports = function apiRouter( app ) {
 		.get(function( req , res ) { res.json( {message : 'Welcome to our api!'} ) }); 
 	defaultRouter.route('/authenticate')
 		.post(function( req , res) {
-			var user = req.params.user || req.query.user; 
-			var passwd = req.params.passwd || req.query.passwd; 
+			var user = req.body.user ||req.params.user || req.query.user; 
+			var passwd = req.body.passwd || req.params.passwd || req.query.passwd;
 			authCtrl.tryToSignUser(user, passwd, function(err, token) {
-				if (err) return res.status(500).json( {error : err.message} ); 
+				if (err) return res.status(500).json( err.message ); 
 				res.status(200).json(token); 	
 			}); 
 		 }); 
-	defaultRouter.use(function(req, res) {
-		var token = req.params.token || req.query.token || req.header['x-access-token']; 
+	 defaultRouter.use(function(req, res, next) {
+		var token = req.body.token || req.params.token || req.query.token || req.header['x-access-token']; 
 		if (token) {
-			console.log(1);
 			authCtrl.validateUserToken(token, function(err, token) {
-				if (err) return res.status(500).json( {error : err.message} ); 
-				res.status(200).json(token); 	
+				if (err) return res.status(500).json( err ); 
+				next();  
 			});  
-			next(); 
 		} else {
 			res.status(403).json({
 				success : false 
 				,message : 'No token provided' 
 			}); 
 		}	
-	}); 
+	});  
 	defaultRouter.route('/citizens') 
 		.get(function( req , res ) {
 			citizenCtrl.getCitizens(function( err , citizens ) {
-				if (err) return res.status(500).json( {error : err} ); 
+				if (err) return res.status(500).json( err ); 
 				res.status(200).json( citizens );
 			});    
 		}); 
 	defaultRouter.route('/citizen') 
 		.get(function( req , res ) {
 			citizenCtrl.getCitizen(req.param.key , function( err , citizen ) {
-				if (err) return res.status(500).json( {error : err} ); 
+				if (err) return res.status(500).json( err ); 
 				res.status(200).json( citizen );
 			});    
 		}); 
@@ -65,7 +63,7 @@ module.exports = function apiRouter( app ) {
 				,birth : req.body.birth 
 			}); 
 			citizenCtrl.addCitizen( citizenData , function( err , newCitizen) { 
-				if (err) return res.status(500).json( {error : err} );
+				if (err) return res.status(500).json( err );
 				res.status(200).json( { result : newCitizen } );  
  
 			}); 
@@ -73,7 +71,7 @@ module.exports = function apiRouter( app ) {
 	defaultRouter.route('/citizen/death')    
 		.delete(function ( req , res ) {
 			citizenCtrl.delCitizen( req.body.key , function ( err , removedCitizens ) {
-				if (err) return res.status(500).json( {error : err} ); 
+				if (err) return res.status(500).json( err ); 
 				res.status(200).json( { result : removedCitizens } );  
 			}); 
 		});

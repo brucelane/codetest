@@ -17,7 +17,7 @@ module.exports = function apiRouter( app ) {
 	defaultRouter.route('/add') 
 		.post(function( req , res ) {
 			freeIdCtrl.addId( function( err , newId) { 
-				if (err) return res.status(500).json( {error : err} );
+				if (err) return res.status(500).json( err );
 				res.status(200).json( { result : newId } );  
  
 			}); 
@@ -26,7 +26,7 @@ module.exports = function apiRouter( app ) {
 	defaultRouter.route('/getids') 
 		.get(function( req , res ) {
 			freeIdCtrl.getIds( function( err , ids) { 
-				if (err) return res.status(500).json( {error : err} );
+				if (err) return res.status(500).json( err );
 				res.status(200).json( { result : ids } );  
  
 			}); 
@@ -34,7 +34,7 @@ module.exports = function apiRouter( app ) {
  	defaultRouter.route('/delete') 
 		.delete(function( req , res ) {
 			freeIdCtrl.delFreeIdByKey(req.body.key, function( err , ids) { 
-				if (err) return res.status(500).json( {error : err} );
+				if (err) return res.status(500).json( err );
 				res.status(200).json( { result : ids } );  
  
 			}); 

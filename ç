@@ -15,8 +15,7 @@ var citizenModel = mongoose.model('Citizen');
 //******************* 
 describe('Make request to /api', function() {
 	describe('/api/authenticate when a user exists' , function() {
-		before(function(done) { 
-			var generatedToken = null; 
+		before(function(done) {
 			mongoose.connect(config.db_connection); 
 			freeIdCtrl.generateNewId(function(err, newKey) {
 				if (err) return done(err);  
@@ -30,11 +29,17 @@ describe('Make request to /api', function() {
 					if (err) return done(err); 
 					should.not.exist(err);
 					isInserted.should.equal(1);
-					citizenModel.findOne({'name':'test', 'secret':'secretKey'}, function(err, citizen) {
-						if (err) return done(err);
-						if (citizen == null) return done(err); 
+					/* citizenCtrl.getCitizens(function(err, citizens) {
+						if (err) return done(err); 
+						console.dir(citizens); 
+						done(); 
+					});*/  
+					citizenModel.findOne({'name':'test', 'secret':'secretKey'}, function(err, citizens) {
+						if (err) return done(err); 
+						// console.dir(citizens); 
 						done(); 
 					});  
+					// done(); 
 				});  
  
 			});
@@ -56,53 +61,40 @@ describe('Make request to /api', function() {
 				.post('/api/authenticate')
 				.send({'user' : 'test', 'passwd' : 'secretKey'}) 
 				.expect(200)
-				.end(function(err, res) { 	
-					if (err) return done(err);
+				.end(function(err, res) { 
 					var body = res.body; 
-					should.exist(body.result); 
-					should.exist(body.token);
-					body.result.should.equal('success');  
-					generatedToken = body.token; 
-					done(); 
-				}); 
-		});
-		it('Should verify a valid token', function(done) { 
-			supertest('http://localhost:8080')
-				.get('/api/citizens')
-				.send({'token' : generatedToken }) 
-				.expect(200)
-				.end(function(err, res) { 	
 					if (err) return done(err);
-					var body = res.body;
-					body.should.be.instanceOf(Array); 
-					body.length.should.equal(1);  
+					should.body.result.equal("success"); 
+					should.exist(body.token); 
 					done(); 
-				});  
+				}); 
+			/* authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {	
+				should.not.exist(err); 
+				done(); 
+			}); */ 
 		});
-		it('Should not generate token if user does not exists', function(done) {
-			supertest('http://localhost:8080')
-				.post('/api/authenticate')
-				.send({'user' : 'non_existent', 'passwd' : 'a_password'}) 
-				.expect(500)
-				.end(function(err, res) {
-					should.exist(res.error); 
-					var userNotFoundError = JSON.parse(res.error.text); 
-					userNotFoundError.should.equal('User not found'); 
+		xit('Should verify a valid token', function(done) { 
+			authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {
+					if (err) return done(err); 
+				authCtrl.validateUserToken(token.token, function(err, decodedToken) {
+					if(err) return done(err); 
 					done(); 
 				}); 
+			}); 
+		});
+		xit('Should not generate token if user does not exists', function(done) {
+			authCtrl.tryToSignUser('username', 'secretKey', function(err, token) { 
+					should.exist(err); 
+					err.message.should.equal("User not found");
+					done();  
+			});
 		}); 
-		it('Should not verify and invalid token', function(done) {
-			supertest('http://localhost:8080')
-				.get('/api/citizens')
-				.send({'token' : generatedToken + "123" }) 
-				.expect(200)
-				.end(function(err, res) { 	
-					should.exist(res.error);
-					var jsonError = JSON.parse( res.error.text ) ;  
-					jsonError.name.should.equal('JsonWebTokenError');
-					jsonError.message.should.equal('invalid signature');  
-					done(); 
-				}); 
+		xit('Should not verify and invalid token', function(done) {
+			authCtrl.validateUserToken("123456", function(err, decodedToken) {
+				should.exist(err); 
+				err.message.should.equal("jwt malformed"); 
+				done(); 
+			}); 	
 		});   
 	});   
 }); 

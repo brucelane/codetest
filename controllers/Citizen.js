@@ -11,13 +11,6 @@ var freeIdCtrl = require('../controllers/FreeId.js');
 // Business Logic **********
 //************************** 
 
-/* var citizensFindAll = function( cb ) {
-	citizen.find({'isValid' : true} , function ( err , citizens ) {
-		if (err) return cb(err, null); 
-		cb(null, citizens);   
-	}).lean(); 	
-}; */ 
-
 var citizensFindAll = function( cb ) {
 	citizen.find({'isValid' : true}).lean().exec(function(err, docs){
 		if(err) return cb(err, null); 
@@ -81,9 +74,9 @@ var citizenDeleteByKey = function( key , cb ) {
 }; 
 
 var citizenDeleteAll = function( cb ) {
-	citizen.remove({}, function(err, removedCitizens) {
+	citizen.remove({}, function(err) {
 		if (err) return cb(err, null);  
-		cb(null, removedCitizens); 
+		cb(null, 1); 
 	}); 
 }; 
 

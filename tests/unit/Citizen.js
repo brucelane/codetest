@@ -108,10 +108,10 @@ describe('Citizen births', function() {
 		}); 
 
 		after(function(done) {
-			citizenCtrl.deleteAll(function(err, totalRemovedCitizens) {
-				if (err) throw(err);
+			citizenCtrl.deleteAll(function(err) {
+				if (err) done(err);
 				freeIdCtrl.delAllFreeIdKeys(function(err, totalRemovedKeys) { 
-					if (err) throw(err); 
+					if (err) done(err); 
 					done(); 
 				});
 			});  
