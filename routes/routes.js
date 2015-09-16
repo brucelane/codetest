@@ -10,13 +10,14 @@ module.exports = function( app ) {
 	//**************** 
  	app.all('*', function( req , res , next ) {
 		var logRequest = new Object({
-			 request : req.toString()
+			 request : req.url 
+			,params : req.body  
 			,type : req.method
 			,ip : req.ip 
 		}); 		
 		logRequestCtrl.addLog(logRequest, function( err , log ) {
-			if (err) console.log(err); 
-			console.log(log); 
+			if (err) throw(err); 
+			// console.dir(logRequest); 
 		}); 
 		next();  
 	});  

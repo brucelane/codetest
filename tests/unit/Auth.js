@@ -12,7 +12,7 @@ var config = require('../../config/config.js');
 //******************* 
 // Test cases ******* 
 //******************* 
-describe('Generate token', function() {
+describe('FreeId', function() {
 	before(function(done) {
 		mongoose.connect(config.db_connection); 
 		done(); 
@@ -31,9 +31,9 @@ describe('Generate token', function() {
 					,sex : "0"
 					,birth : "12/02/1986"
 				}); 
-				citizenCtrl.addCitizen(citizenDataModel, function(err, isInserted) {
+				citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
 					should.not.exist(err);
-					isInserted.should.equal(1); 
+					should.exist(citizenKey); 
 					done(); 
 				});  
  
@@ -50,13 +50,13 @@ describe('Generate token', function() {
 			});  
 		}); 
 
-		it('Should generate a valid token', function(done) {
+		it('should generate a valid token', function(done) {
 			authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {	
 				should.not.exist(err); 
 				done(); 
 			}); 
 		});
-		it('Should verify a valid token', function(done) { 
+		it('should validate a valid token', function(done) { 
 			authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {
 					if (err) return done(err); 
 				authCtrl.validateUserToken(token.token, function(err, decodedToken) {
@@ -65,14 +65,14 @@ describe('Generate token', function() {
 				}); 
 			}); 
 		});
-		it('Should not generate token if user does not exists', function(done) {
+		it('should not generate token if user does not exists', function(done) {
 			authCtrl.tryToSignUser('username', 'secretKey', function(err, token) { 
 					should.exist(err); 
 					err.message.should.equal("User not found");
 					done();  
 			});
 		}); 
-		it('Should not verify and invalid token', function(done) {
+		it('should not validate an invalid token', function(done) {
 			authCtrl.validateUserToken("123456", function(err, decodedToken) {
 				should.exist(err); 
 				err.message.should.equal("jwt malformed"); 
@@ -80,4 +80,4 @@ describe('Generate token', function() {
 			}); 	
 		});   
 	});   
-}); 
+});

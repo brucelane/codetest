@@ -51,7 +51,7 @@ var citizenAdd = function( citizenData , cb ) {
 				if (err) return cb(err, null); 
 				citizen.update( {'isValid' : true}, null,  function(err, updatedCitizen){
 					if (err) cb(err, null); 
-					cb(null, updatedCitizen); 
+					cb(null, citizen.key); 
 				}); 
 			});	
 		}); 

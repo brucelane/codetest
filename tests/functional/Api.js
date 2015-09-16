@@ -16,7 +16,8 @@ var citizenModel = mongoose.model('Citizen');
 describe('Make request to /api', function() {
 	describe('/api/authenticate when a user exists' , function() {
 		before(function(done) { 
-			var generatedToken = null; 
+			var generatedToken = null;
+			var generatedTokenAddBirth = null;  
 			mongoose.connect(config.db_connection); 
 			freeIdCtrl.generateNewId(function(err, newKey) {
 				if (err) return done(err);  
@@ -26,10 +27,10 @@ describe('Make request to /api', function() {
 					,sex : "0"
 					,birth : "12/02/1986"
 				}); 
-				citizenCtrl.addCitizen(citizenDataModel, function(err, isInserted) {
+				citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
 					if (err) return done(err); 
 					should.not.exist(err);
-					isInserted.should.equal(1);
+					should.exist(citizenKey); 
 					citizenModel.findOne({'name':'test', 'secret':'secretKey'}, function(err, citizen) {
 						if (err) return done(err);
 						if (citizen == null) return done(err); 
@@ -51,10 +52,9 @@ describe('Make request to /api', function() {
 			});  
 		}); 
 
-		it('Should generate a valid token', function(done) {
+		it('should generate a valid token', function(done) {
 			supertest('http://localhost:8080')
-				.post('/api/authenticate')
-				.send({'user' : 'test', 'passwd' : 'secretKey'}) 
+				.post('/api/authenticate/test/secretKey')
 				.expect(200)
 				.end(function(err, res) { 	
 					if (err) return done(err);
@@ -66,10 +66,10 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		});
-		it('Should verify a valid token', function(done) { 
+		it('should verify a valid token', function(done) { 
 			supertest('http://localhost:8080')
 				.get('/api/citizens')
-				.send({'token' : generatedToken }) 
+				.set({'x-access-token' : generatedToken }) 
 				.expect(200)
 				.end(function(err, res) { 	
 					if (err) return done(err);
@@ -79,23 +79,22 @@ describe('Make request to /api', function() {
 					done(); 
 				});  
 		});
-		it('Should not generate token if user does not exists', function(done) {
+		it('should not generate token if user does not exists', function(done) {
 			supertest('http://localhost:8080')
-				.post('/api/authenticate')
-				.send({'user' : 'non_existent', 'passwd' : 'a_password'}) 
+				.post('/api/authenticate/non_existent/a_password')
 				.expect(500)
 				.end(function(err, res) {
 					if (err) return done(err);
 					should.exist(res.error); 
 					var userNotFoundError = JSON.parse(res.error.text); 
-					userNotFoundError.should.equal('User not found'); 
+					userNotFoundError.message.should.equal('User not found'); 
 					done(); 
 				}); 
 		}); 
-		it('Should reject an invalid token', function(done) {
+		it('should reject an invalid token', function(done) {
 			supertest('http://localhost:8080')
 				.get('/api/citizens')
-				.send({'token' : generatedToken + "123" }) 
+				.set({'x-access-token' : generatedToken + "123" }) 
 				.expect(500)
 				.end(function(err, res) { 	
 					if (err) return done(err);
@@ -106,7 +105,7 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		});
-		it('Should allow access on / without token', function(done) {
+		it('should allow access on / without token', function(done) {
 			supertest('http://localhost:8080')
 				.get('/')
 				.expect(200)
@@ -118,7 +117,7 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		});    
-		it('Should allow access on /api without token', function(done) {
+		it('should allow access on /api without token', function(done) {
 			supertest('http://localhost:8080')
 				.get('/api')
 				.expect(200)
@@ -130,18 +129,18 @@ describe('Make request to /api', function() {
 					done(); 
 				});
 		}); 
-		it('Should allow access on /api/authenticate without token', function(done) {
+		it('should allow access on /api/authenticate without token', function(done) {
 			supertest('http://localhost:8080')
-				.post('/api/authenticate')
-				.expect(403)
+				.post('/api/authenticate/test/user')
+				.expect(500)
 				.end(function(err, res) {
 					if (err) return done(err);
 					should.exist(res.body);
-					res.body.message.should.equal('No user data provided');  
+					res.body.message.should.equal('User not found');  
 					done(); 
 				});  	
 		});
-		it('Should not allow access on /api/citizens without token', function(done) {
+		it('should not allow access on /api/citizens without token', function(done) {
 			supertest('http://localhost:8080')
 				.get('/api/citizens')
 				.expect(403)
@@ -153,9 +152,9 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		}); 
-		it('Should not allow access on /api/citizen without token', function(done) {
+		it('should not allow access on /api/citizen without token', function(done) {
 			supertest('http://localhost:8080')
-				.get('/api/citizen')
+				.post('/api/citizen/123123')
 				.expect(403)
 				.end(function(err, res) { 
 					if (err) return done(err);
@@ -165,9 +164,9 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		}); 
-		it('Should not allow access on /api/citizen/birth without token', function(done) {
+		it('should not allow access on /api/citizen/birth without token', function(done) {
 			supertest('http://localhost:8080')
-				.get('/api/authenticate')
+				.post('/api/authenticate')
 				.expect(403)
 				.end(function(err, res) { 
 					if (err) return done(err);
@@ -177,9 +176,9 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		});
- 		it('Should not allow access on /api/citizen/death without token', function(done) { 
+ 		it('should not allow access on /api/citizen/death without token', function(done) { 
 			supertest('http://localhost:8080')
-				.get('/api/authenticate')
+				.delete('/api/citizen/death/123')
 				.expect(403)
 				.end(function(err, res) { 
 					if (err) return done(err);
@@ -189,7 +188,7 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		}); 
-		it('Should allow access on /api/citizens with valid token', function(done) {
+		it('should allow access on /api/citizens with valid token', function(done) {
 			supertest('http://localhost:8080')
 				.get('/api/citizens')
 				.set({'x-access-token' : generatedToken}) 
@@ -200,9 +199,9 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		}); 
-		it('Should allow access on /api/citizen with valid token', function(done) {
+		it('should allow access on /api/citizen with valid token', function(done) {
 			supertest('http://localhost:8080')
-				.get('/api/citizen')
+				.get('/api/citizen/' + generatedToken)
 				.send({'key' : generatedToken})
 				.set({'x-access-token' : generatedToken}) 
 				.expect(200)
@@ -212,28 +211,65 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		}); 
-		it('Should allow access on /api/citizen/birth with valid token', function(done) {
+		it('should allow access on /api/citizen/birth with valid token', function(done) {
 			supertest('http://localhost:8080')
-				.post('/api/citizen/birth')
+				.post('/api/citizen/birth/userTest/secret/1/12021986')
 				.set({'x-access-token' : generatedToken}) 
 				.expect(500)
-				.end(function(err, res) { 
-					if (err) return done(err);
+				.end(function(err, res) {
+					if (err) return done(err); 
 					should.exist(res);
+					res.unauthorized.should.equal(false); 
+					should.exist(res.error); 
+					var errorMessage = JSON.parse(res.error.text); 
+					errorMessage.should.equal("No id available"); 
 					done(); 
 				}); 
 		});
- 		it('Should allow access on /api/citizen/death with token', function(done) { 
+ 		it('should allow access on /api/citizen/death with token', function(done) { 
 			supertest('http://localhost:8080')
-				.delete('/api/citizen/death')
+				.delete('/api/citizen/death/123')
 				.set({'x-access-token' : generatedToken}) 
 				.expect(500)
-				.end(function(err, res) { 
-					if (err) return done(err);
+				.end(function(err, res) {
+					if (err) return done(err); 
 					should.exist(res);
+					res.unauthorized.should.equal(false); 
+					should.exist(res.error); 
+					var errorMessage = JSON.parse(res.error.text); 
+					errorMessage.should.equal("Citizen not found"); 
 					done(); 
 				}); 
-		});  
- 
+		}); 
+		it('should add a birth', function(done) {
+			freeIdCtrl.generateNewId(function(err, newKey) {
+				if (err) return done(err); 
+				generatedTokenAddBirth = newKey.key; 
+			}); 
+			 supertest('http://localhost:8080')
+				.post('/api/citizen/birth/userTest/secret/1/12021986')
+				.set({'x-access-token' : generatedToken}) 
+				.expect(200)
+				.end(function(err, res) {
+					if (err) return done(err);
+	 				should.exist(res);
+					should.exist(res.text); 
+					res.unauthorized.should.equal(false); 
+					done(); 
+			}); 
+		});
+		it('should add a death', function(done) { 
+			supertest('http://localhost:8080')
+				.delete('/api/citizen/death/' + generatedTokenAddBirth)
+				.set({'x-access-token' : generatedToken}) 
+				.expect(200)
+				.end(function(err, res) {
+					if (err) return done(err); 
+					should.exist(res);
+					res.unauthorized.should.equal(false); 	
+					res.body.result.should.equal(1);  
+					done(); 
+				}); 
+		});    
 	});   
 }); 
