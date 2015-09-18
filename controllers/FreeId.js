@@ -12,7 +12,7 @@ var freeId = mongoose.model('FreeId');
 //************************** 
 
 var freeIdsFindAll = function( cb ) {
-	freeId.find( function ( err , freeIds ) {
+	freeId.find({}, function ( err , freeIds ) {
 		if (err) return cb(err, null); 
 		cb(null, freeIds);   
 	}); 	
@@ -50,8 +50,6 @@ var freeIdDeleteAll = function( cb ) {
 }; 
 
 var freeIdGetOne = function(cb) {
-	// console.dir(freeId);
-	// console.dir(cb);  
 	freeId.findOne({}, function(err , returnedFreeId) {
 		if (err || returnedFreeId == null || returnedFreeId === '' || returnedFreeId === []) return cb(err || new Error("No id available"), null); 
 		cb(null, returnedFreeId); 

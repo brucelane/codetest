@@ -17,13 +17,15 @@ describe('Citizens', function() {
 		done(); 
 	}); 
 	after(function(done) {
+		citizenCtrl.deleteAll(done); 
+		freeIdCtrl.delAllFreeIdKeys(done); 
 		mongoose.disconnect(); 
 		done(); 
 	}); 
 	describe('Add citizen birth when no setup loaded' , function() {
 		it('Should return an empty array of citizen births when retrieving all citizen births', function(done) {
 			citizenCtrl.getCitizens(function(err, citizens) {
-				should.not.exist(err);  
+				if (err) return done(err); 
 				should.exist(citizens); 
 				citizens.should.be.an.instanceOf(Array); 
 				citizens.length.should.equal(0); 
@@ -69,7 +71,7 @@ describe('Citizens', function() {
  
 		it('should return an empty citizen when key does not exist', function(done) {
 			citizenCtrl.getCitizen("123", function(err, citizen) {
-				should.not.exist(err); 
+				if (err) return done(err); 
 				should.not.exist(citizen); 
 				done();  
 			}); 
@@ -88,7 +90,7 @@ describe('Citizens', function() {
 				name : "test" 
 				,secret : "secretKey" 
 				,sex : "0"
-				,birth : "12/02/1986"
+				,birth : new Date("02-12-1986") 
 			}); 
 			citizenCtrl.addCitizen(citizenDataModel, function(err, citizen) {
 				should.exist(err); 
@@ -101,7 +103,7 @@ describe('Citizens', function() {
 	describe('Add citizen birth when setup loaded' , function() {
 		before(function(done) {
 			freeIdCtrl.generateNewId(function(err, newKey) {
-				if (err) throw(err); 
+				if (err) done(err); 
 				done(); 
 			}); 
 		}); 
@@ -121,18 +123,18 @@ describe('Citizens', function() {
 				name : "test" 
 				,secret : "secretKey" 
 				,sex : "0"
-				,birth : "12/02/1986"
+				,birth : new Date("02-12-1986") 
 			}); 
 
 			citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
-				should.not.exist(err);
+				if (err) return done(err); 
 				should.exist(citizenKey); 
 				done(); 
 			}); 
 		}); 
 		it('should return an array of citizens when retrieving all citizen births', function(done) {
 			citizenCtrl.getCitizens(function(err, citizens) {
-				should.not.exist(err); 
+				if (err) done(err); 
 				citizens.should.be.an.instanceOf(Array);
 				citizens[0].name.should.equal('test'); 
 				done(); 
@@ -141,7 +143,7 @@ describe('Citizens', function() {
 		it('should return a citizen when searching by citizen key', function(done) {
 			citizenCtrl.getCitizens(function(err, citizens) {
 				citizenCtrl.getCitizen(citizens[0].key, function(err, citizen) {
-					should.not.exist(err); 
+					if (err) done(err); 
 					citizen.key.should.equal(citizens[0].key); 
 					done(); 	
 				}); 	
@@ -150,7 +152,7 @@ describe('Citizens', function() {
 		it('should delete citizen by key', function(done) {	
 			citizenCtrl.getCitizens(function(err, citizens) {
 				citizenCtrl.delCitizen(citizens[0].key, function(err, totalCitizensRemoved) {
-					should.not.exist(err); 
+					if (err) done(err); 
 					totalCitizensRemoved.should.equal(1); 
 					done(); 	
 				}); 	
@@ -158,7 +160,7 @@ describe('Citizens', function() {
 		}); 
 		it('after delete citizen, key must be pushed back to FreeId\'s collection', function(done) {
 			freeIdCtrl.getIds(function(err, ids) {
-				should.not.exist(err); 
+				if (err) done(err); 
 				ids.should.be.instanceOf(Array);
 				ids.length.should.equal(1);  
 				done(); 
@@ -171,10 +173,10 @@ describe('Citizens', function() {
 				name : "test" 
 				,secret : "secretKey" 
 				,sex : "0"
-				,birth : "12/02/1986"
+				,birth : new Date("02-12-1986")
 			});
 			citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
-				should.not.exist(err);
+				if (err) done(err); 
 				should.exist(citizenKey);  
 				done(); 
 			});  
@@ -183,7 +185,7 @@ describe('Citizens', function() {
 		after(function(done) {
 			citizenCtrl.getCitizens(function(err, citizens) {
 				citizenCtrl.getCitizen(citizens[0].key, function(err, citizen) {
-					should.not.exist(err); 
+					if (err) done(err); 
 					citizen.key.should.equal(citizens[0].key); 
 					done(); 	
 				}); 	

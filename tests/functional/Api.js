@@ -17,27 +17,29 @@ describe('Make request to /api', function() {
 	describe('/api/authenticate when a user exists' , function() {
 		before(function(done) { 
 			var generatedToken = null;
-			var generatedTokenAddBirth = null;  
+			var generatedFreeIdKey = null;  
 			mongoose.connect(config.db_connection); 
 			freeIdCtrl.generateNewId(function(err, newKey) {
 				if (err) return done(err);  
+				generatedFreeIdKey = newKey; 
 				var citizenDataModel = new citizenModel({
 					name : "test" 
 					,secret : "secretKey" 
 					,sex : "0"
-					,birth : "12/02/1986"
+					,birth : new Date("02-12-1986") 
 				}); 
 				citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
 					if (err) return done(err); 
 					should.not.exist(err);
-					should.exist(citizenKey); 
-					citizenModel.findOne({'name':'test', 'secret':'secretKey'}, function(err, citizen) {
+					should.exist(citizenKey);
+					citizenKey.should.equal(citizenKey);  
+					citizenModel.findOne({'name':'test', 'secret':'secretKey'}, function(err, newCitizen) {
 						if (err) return done(err);
-						if (citizen == null) return done(err); 
+						if (newCitizen == null) return done(err); 
+						newCitizen.key.should.equal(generatedFreeIdKey.key); 
 						done(); 
 					});  
 				});  
- 
 			});
 		}); 
 
@@ -59,8 +61,8 @@ describe('Make request to /api', function() {
 				.end(function(err, res) { 	
 					if (err) return done(err);
 					var body = res.body; 
-					should.exist(body.result); 
-					should.exist(body.token);
+					should.exist(res.body.result); 
+					should.exist(res.body.token);
 					body.result.should.equal('success');  
 					generatedToken = body.token; 
 					done(); 
@@ -74,8 +76,8 @@ describe('Make request to /api', function() {
 				.end(function(err, res) { 	
 					if (err) return done(err);
 					var body = res.body;
-					body.should.be.instanceOf(Array); 
-					body.length.should.equal(1);  
+					res.body.should.be.instanceOf(Array); 
+					res.body.length.should.equal(1);  
 					done(); 
 				});  
 		});
@@ -99,7 +101,7 @@ describe('Make request to /api', function() {
 				.end(function(err, res) { 	
 					if (err) return done(err);
 					should.exist(res.error);
-					var jsonError = JSON.parse( res.error.text ) ;  
+					var jsonError = JSON.parse(res.error.text) ;  
 					jsonError.name.should.equal('JsonWebTokenError');
 					jsonError.message.should.equal('invalid signature');  
 					done(); 
@@ -148,7 +150,7 @@ describe('Make request to /api', function() {
 					if (err) return done(err);
 					should.exist(res.text);
 					var responseMessage = JSON.parse(res.text); 
-					responseMessage.message.should.equal('No token provided');  
+					res.body.message.should.equal('No token provided');  
 					done(); 
 				}); 
 		}); 
@@ -160,7 +162,7 @@ describe('Make request to /api', function() {
 					if (err) return done(err);
 					should.exist(res.text);
 					var responseMessage = JSON.parse(res.text); 
-					responseMessage.message.should.equal('No token provided');  
+					res.body.message.should.equal('No token provided');  
 					done(); 
 				}); 
 		}); 
@@ -172,7 +174,7 @@ describe('Make request to /api', function() {
 					if (err) return done(err);
 					should.exist(res.text);
 					var responseMessage = JSON.parse(res.text); 
-					responseMessage.message.should.equal('No token provided');  
+					res.body.message.should.equal('No token provided');  
 					done(); 
 				}); 
 		});
@@ -184,7 +186,7 @@ describe('Make request to /api', function() {
 					if (err) return done(err);
 					should.exist(res.text);
 					var responseMessage = JSON.parse(res.text); 
-					responseMessage.message.should.equal('No token provided');  
+					res.body.message.should.equal('No token provided');  
 					done(); 
 				}); 
 		}); 
@@ -241,26 +243,53 @@ describe('Make request to /api', function() {
 					done(); 
 				}); 
 		}); 
-		it('should add a birth', function(done) {
+		it('should not add a birth with invalid date', function(done) {
 			freeIdCtrl.generateNewId(function(err, newKey) {
 				if (err) return done(err); 
-				generatedTokenAddBirth = newKey.key; 
+				generatedFreeIdKey = newKey.key; 
 			}); 
 			 supertest('http://localhost:8080')
-				.post('/api/citizen/birth/userTest/secret/1/12021986')
+				.post('/api/citizen/birth/userTest/secret/1/19861202')
+				.set({'x-access-token' : generatedToken}) 
+				.expect(500)
+				.end(function(err, res) {
+					if (err) return done(err);
+	 				should.exist(res.error);
+					should.exist(res.error.text);
+					var errorMessage = JSON.parse(res.error.text);  
+					res.unauthorized.should.equal(false); 
+					errorMessage.should.equal('Invalid date, format: MM-DD-YYYY'); 
+					done(); 
+			}); 
+		});
+	it('should add a birth', function(done) {
+			 supertest('http://localhost:8080')
+				.post('/api/citizen/birth/userTest/secret/1/02-12-1986')
 				.set({'x-access-token' : generatedToken}) 
 				.expect(200)
 				.end(function(err, res) {
 					if (err) return done(err);
 	 				should.exist(res);
-					should.exist(res.text); 
+					should.exist(res.body);
+					res.body.result.should.equal(generatedFreeIdKey);   
 					res.unauthorized.should.equal(false); 
 					done(); 
 			}); 
 		});
+		it('should get citizen from /api/citizen with valid token', function(done) {
+			supertest('http://localhost:8080')
+				.get('/api/citizen/' + generatedFreeIdKey)
+				.set({'x-access-token' : generatedToken}) 
+				.expect(200)
+				.end(function(err, res) { 
+					if (err) return done(err);
+					should.exist(res);
+					done(); 
+				}); 
+		});
 		it('should add a death', function(done) { 
 			supertest('http://localhost:8080')
-				.delete('/api/citizen/death/' + generatedTokenAddBirth)
+				.delete('/api/citizen/death/' + generatedFreeIdKey)
 				.set({'x-access-token' : generatedToken}) 
 				.expect(200)
 				.end(function(err, res) {

@@ -1,0 +1,18 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'test' ]
+2 info using npm@1.3.24
+3 info using node@v0.12.0
+4 error Error: ENOENT, open '/Users/jarpi/codetest/tests/functional/package.json'
+4 error     at Error (native)
+5 error If you need help, you may report this *entire* log,
+5 error including the npm and node versions, at:
+5 error     <http://github.com/isaacs/npm/issues>
+6 error System Darwin 14.1.0
+7 error command "node" "/usr/local/bin/npm" "test"
+8 error cwd /Users/jarpi/codetest/tests/functional
+9 error node -v v0.12.0
+10 error npm -v 1.3.24
+11 error path /Users/jarpi/codetest/tests/functional/package.json
+12 error code ENOENT
+13 error errno -2
+14 verbose exit [ -2, true ]

@@ -29,22 +29,21 @@ describe('FreeId', function() {
 					name : "test" 
 					,secret : "secretKey" 
 					,sex : "0"
-					,birth : "12/02/1986"
-				}); 
+					,birth :"02-12-1986"
+				});
 				citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
-					should.not.exist(err);
+					if (err) return done(err); 
 					should.exist(citizenKey); 
 					done(); 
-				});  
- 
+				});   
 			});
 		}); 
 
 		after(function(done) {
 			citizenCtrl.deleteAll(function(err, totalRemovedCitizens) {
-				if (err) throw(err);
+				if (err) done(err);
 				freeIdCtrl.delAllFreeIdKeys(function(err, totalRemovedKeys) { 
-					if (err) throw(err); 
+					if (err) return done(err); 
 					done(); 
 				});
 			});  
@@ -52,7 +51,7 @@ describe('FreeId', function() {
 
 		it('should generate a valid token', function(done) {
 			authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {	
-				should.not.exist(err); 
+				if (err) return done(err); 
 				done(); 
 			}); 
 		});

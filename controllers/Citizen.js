@@ -35,7 +35,9 @@ var citizenFindByKey = function ( key ,  cb ) {
 var citizenAdd = function( citizenData , cb ) { 
 	if ( !citizenData || citizenData === {} ) return cb("No data defined"); 
 	var freeId = freeIdCtrl.deQueue(function(err, id) {
-		if (err) return cb(err, null); 
+		if (err) return cb(err, null);
+		if (!isValidDate(citizenData.birth)) return cb(new Error("Invalid date, format: MM-DD-YYYY")); 
+		// Must fix that, pass parameters not object 
 		var citizenDataModel = new citizenModel({
 		 	name : citizenData.name 
 			,secret : citizenData.secret
@@ -60,7 +62,7 @@ var citizenAdd = function( citizenData , cb ) {
 
 var citizenDeleteByKey = function( key , cb ) {
 	if ( !key || key === "" ) return cb(new Error("No key defined"), null); 
-	citizen.findOne({'key' : key , 'isValid' : true }, function(err, findedCitizen) {
+	citizen.findOne({'key' : key , 'isValid' : true}).lean().exec(function ( err , findedCitizen ) {
 		if (err) return cb(err, null); 
 		if (findedCitizen == null) return cb(new Error("Citizen not found"), null); 
 		citizen.remove({ 'key' : key }, function(err , removedDocs) {
@@ -79,6 +81,13 @@ var citizenDeleteAll = function( cb ) {
 		cb(null, 1); 
 	}); 
 }; 
+
+function isValidDate(d) {
+	var datePattern = /((0[1-9]|[0-1][0-2])-([0-2][0-2]|3[0-1])-(1[0-9][0-9][0-9]|20[0-1][0-5]))/g;
+	if (Object.prototype.toString.call(d) !== '[object Date]') return false;
+	var dStr = ((d.getMonth()+1)<10?'0'+(d.getMonth()+1):(d.getMonth()+1)) + '-' + (d.getDate()<10?'0'+d.getDate():d.getDate()) + '-' + d.getFullYear(); 
+	return datePattern.test(dStr);  
+}
 
 module.exports = { getCitizens : citizensFindAll , getCitizen : citizenFindByKey , addCitizen : citizenAdd , delCitizen : citizenDeleteByKey , deleteAll : citizenDeleteAll }; 
  
