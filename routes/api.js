@@ -67,13 +67,7 @@ module.exports = function apiRouter( app ) {
 
 	defaultRouter.route('/citizen/birth/:name/:secret/:sex/:birth')  
 		.post(function( req , res ) {
-			var citizenData = new Object({
-				 name : req.params.name
-				,secret : req.params.secret
-				,sex : req.params.sex
-				,birth : new Date(req.params.birth) 
-			});
-			citizenCtrl.addCitizen( citizenData , function( err , newCitizen) { 
+			citizenCtrl.addCitizen( req.params.name, req.params.secret, req.params.sex, new Date(req.params.birth) , function( err , newCitizen) { 
 				if (err) return res.status(500).json( err.message );
 				res.status(200).json( { result : newCitizen } );   
 			}); 
@@ -81,7 +75,7 @@ module.exports = function apiRouter( app ) {
 
 	defaultRouter.route('/citizen/death/:key')    
 		.delete(function ( req , res ) {
-			citizenCtrl.delCitizen( req.params.key.toString() , function ( err , removedCitizens ) {
+			citizenCtrl.delCitizen( req.params.key , function ( err , removedCitizens ) {
 				if (err) return res.status(500).json( err.message );
 				res.status(200).json( { result : removedCitizens } );  
 			}); 

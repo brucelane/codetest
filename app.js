@@ -21,7 +21,7 @@ if(config.environment === "dev") app.use(morgan('dev'));
 // Routes ****  
 //************
 
-require('./routes/routes.js')( app ); 
+require('./routes/index.js')( app ); 
 
 app.listen(port); 
 console.log('app initialized'); 

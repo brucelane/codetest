@@ -1,11 +1,10 @@
 //******************
 // Dependencies **** 
 //****************** 
-var should = require('should'); 
 var mongoose = require('mongoose'); 
+var should = require('should'); 
 var citizenCtrl = require('../../controllers/Citizen.js'); 
 var freeIdCtrl = require('../../controllers/FreeId.js'); 
-var citizenModel = mongoose.model('Citizen'); 
 var config = require('../../config/config.js'); 
 
 //******************* 
@@ -86,13 +85,7 @@ describe('Citizens', function() {
 
 		}); 
 		it('should not add a citizen birth because there aren\'t free id\'s', function(done) {
-			var citizenDataModel = new citizenModel({
-				name : "test" 
-				,secret : "secretKey" 
-				,sex : "0"
-				,birth : new Date("02-12-1986") 
-			}); 
-			citizenCtrl.addCitizen(citizenDataModel, function(err, citizen) {
+			citizenCtrl.addCitizen("test","secretKey","0",new Date("02-12-29186"), function(err, citizen) {
 				should.exist(err); 
 				err.should.be.an.instanceOf(Error).and.have.property('message'); ; 
 				err.message.should.equal("No id available");  
@@ -119,14 +112,7 @@ describe('Citizens', function() {
 		}); 
 
 		it('should add one citizen', function(done) {
-			var citizenDataModel = new citizenModel({
-				name : "test" 
-				,secret : "secretKey" 
-				,sex : "0"
-				,birth : new Date("02-12-1986") 
-			}); 
-
-			citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
+			citizenCtrl.addCitizen("test","secretKey","0",new Date("02-12-2986"), function(err, citizenKey) {
 				if (err) return done(err); 
 				should.exist(citizenKey); 
 				done(); 
@@ -175,7 +161,7 @@ describe('Citizens', function() {
 				,sex : "0"
 				,birth : new Date("02-12-1986")
 			});
-			citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
+			citizenCtrl.addCitizen("test","secretKey","0",new Date("02-12-2986"), function(err, citizenKey) {
 				if (err) done(err); 
 				should.exist(citizenKey);  
 				done(); 
@@ -219,7 +205,48 @@ describe('Citizens', function() {
 				err.message.should.equal("No key defined"); 
 				done(); 
 			}); 
+		});
+		it('should return true for valid month', function(done) {
+			return done((!citizenCtrl.checkDate(new Date("01-01-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("09-01-1900"))?new Error("Invalid date"):"")); 
+			return done((!citizenCtrl.checkDate(new Date("10-01-1900"))?new Error("Invalid date"):""));
+			return done((!citizenCtrl.checkDate(new Date("12-01-1900"))?new Error("Invalid date"):"")); 	
+ 			done(); 	
+		});    
+		it('should return true for valid day', function(done) {
+			return done((!citizenCtrl.checkDate(new Date("01-01-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("09-09-1900"))?new Error("Invalid date"):"")); 
+			return done((!citizenCtrl.checkDate(new Date("10-10-1900"))?new Error("Invalid date"):""));
+			return done((!citizenCtrl.checkDate(new Date("12-19-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("12-20-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("12-29-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("12-30-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("12-31-1900"))?new Error("Invalid date"):"")); 	
+ 			done(); 	
 		});   
+ 		it('should return true for valid year', function(done) {
+			return done((!citizenCtrl.checkDate(new Date("01-01-1900"))?new Error("Invalid date"):"")); 	
+			return done((!citizenCtrl.checkDate(new Date("09-09-1999"))?new Error("Invalid date"):"")); 
+			return done((!citizenCtrl.checkDate(new Date("10-10-2000"))?new Error("Invalid date"):""));
+			return done((!citizenCtrl.checkDate(new Date("12-19-2999"))?new Error("Invalid date"):"")); 	
+ 			done(); 	
+		});   
+ 		it('should return false for invalid month', function(done) {
+			return done((citizenCtrl.checkDate(new Date("00-01-1900"))?new Error("Invalid date"):"")); 	
+			return done((citizenCtrl.checkDate(new Date("13-01-1900"))?new Error("Invalid date"):"")); 
+ 			done(); 	
+		});    
+		it('should return false for invalid day', function(done) {
+			return done((citizenCtrl.checkDate(new Date("01-00-1900"))?new Error("Invalid date"):"")); 	
+			return done((citizenCtrl.checkDate(new Date("09-32-1900"))?new Error("Invalid date"):"")); 
+ 			done(); 	
+		});   
+ 		it('should return false for invalid year', function(done) {
+			return done((citizenCtrl.checkDate(new Date("01-01-1800"))?new Error("Invalid date"):"")); 	
+			return done((citizenCtrl.checkDate(new Date("09-09-3000"))?new Error("Invalid date"):"")); 
+ 			done(); 	
+		});   
+	
 		xit('should not add citizen birth when free id available and citizen data is not format compliant', function(done) {
 			// Try date as other format 
 			done(); 

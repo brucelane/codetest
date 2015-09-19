@@ -25,13 +25,7 @@ describe('FreeId', function() {
 		before(function(done) {
 			freeIdCtrl.generateNewId(function(err, newKey) {
 				if (err) throw(err); 
-				var citizenDataModel = new citizenModel({
-					name : "test" 
-					,secret : "secretKey" 
-					,sex : "0"
-					,birth :"02-12-1986"
-				});
-				citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
+			citizenCtrl.addCitizen("test","secretKey","0",new Date("02-12-2986"), function(err, citizenKey) {
 					if (err) return done(err); 
 					should.exist(citizenKey); 
 					done(); 

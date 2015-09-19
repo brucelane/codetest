@@ -1,7 +1,6 @@
 //****************
 // Dependencies***
 //**************** 
-
 var mongoose = require('mongoose'); 
 var citizenModel = require('../models/Citizen.js'); 
 var citizen = mongoose.model('Citizen');
@@ -26,23 +25,31 @@ var citizenFindByKey = function ( key ,  cb ) {
 	}); 
 }; 
 
+var citizenFindOneByParams = function ( params ,  cb ) {
+	if ( !params || params === "") return cb(new Error("No key defined"), null); 
+	 citizen.findOne(params).lean().exec(function ( err , firstCitizenFinded ) {
+		if (err) return cb(err, null); 
+		cb(null, firstCitizenFinded);   
+	}); 
+}; 
+
+
 //**************************************************************************
 // Action: Add a new birth to db 					****
 // Restrictions: 							****
 // 	- Citizen key must be one of the existing keys			****
 // 	- Until key is not deleted from collection, user is invalid	****
 //**************************************************************************
-var citizenAdd = function( citizenData , cb ) { 
-	if ( !citizenData || citizenData === {} ) return cb("No data defined"); 
+var citizenAdd = function( name, secret, sex, birth , cb ) { 
+	if (["0","1","2"].indexOf(sex)===-1) return cb(new Error("Invalid sex, valid data [0,1,2]"), null); 
+	if (!isValidDate(birth)) return cb(new Error("Invalid date, format: MM-DD-YYYY"), null); 
 	var freeId = freeIdCtrl.deQueue(function(err, id) {
 		if (err) return cb(err, null);
-		if (!isValidDate(citizenData.birth)) return cb(new Error("Invalid date, format: MM-DD-YYYY")); 
-		// Must fix that, pass parameters not object 
-		var citizenDataModel = new citizenModel({
-		 	name : citizenData.name 
-			,secret : citizenData.secret
-			,sex : citizenData.sex
-			,birth : citizenData.birth
+		var citizenDataModel = new citizen({
+		 	name : name 
+			,secret : secret
+			,sex : sex
+			,birth : birth
 			,key : id.key
 			,isValid : false 
 		}); 
@@ -82,12 +89,20 @@ var citizenDeleteAll = function( cb ) {
 	}); 
 }; 
 
-function isValidDate(d) {
-	var datePattern = /((0[1-9]|[0-1][0-2])-([0-2][0-2]|3[0-1])-(1[0-9][0-9][0-9]|20[0-1][0-5]))/g;
+var isValidDate = function (d) {
+	var datePattern = /((0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])-(19[0-9][0-9]|2[0-9][0-9][0-9]))/g;
 	if (Object.prototype.toString.call(d) !== '[object Date]') return false;
 	var dStr = ((d.getMonth()+1)<10?'0'+(d.getMonth()+1):(d.getMonth()+1)) + '-' + (d.getDate()<10?'0'+d.getDate():d.getDate()) + '-' + d.getFullYear(); 
 	return datePattern.test(dStr);  
 }
 
-module.exports = { getCitizens : citizensFindAll , getCitizen : citizenFindByKey , addCitizen : citizenAdd , delCitizen : citizenDeleteByKey , deleteAll : citizenDeleteAll }; 
+module.exports = { 
+	getCitizens : citizensFindAll 
+	,getCitizen : citizenFindByKey 
+	,getCitizenBy : citizenFindOneByParams 
+	,addCitizen : citizenAdd 
+	,delCitizen : citizenDeleteByKey 
+	,deleteAll : citizenDeleteAll 
+	,checkDate : isValidDate
+}; 
  

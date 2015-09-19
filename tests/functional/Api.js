@@ -22,13 +22,7 @@ describe('Make request to /api', function() {
 			freeIdCtrl.generateNewId(function(err, newKey) {
 				if (err) return done(err);  
 				generatedFreeIdKey = newKey; 
-				var citizenDataModel = new citizenModel({
-					name : "test" 
-					,secret : "secretKey" 
-					,sex : "0"
-					,birth : new Date("02-12-1986") 
-				}); 
-				citizenCtrl.addCitizen(citizenDataModel, function(err, citizenKey) {
+				citizenCtrl.addCitizen("test", "secretKey", "0", new Date("02-13-1986"), function(err, citizenKey) {
 					if (err) return done(err); 
 					should.not.exist(err);
 					should.exist(citizenKey);
@@ -215,7 +209,7 @@ describe('Make request to /api', function() {
 		}); 
 		it('should allow access on /api/citizen/birth with valid token', function(done) {
 			supertest('http://localhost:8080')
-				.post('/api/citizen/birth/userTest/secret/1/12021986')
+				.post('/api/citizen/birth/userTest/secret/1/02-12-1986')
 				.set({'x-access-token' : generatedToken}) 
 				.expect(500)
 				.end(function(err, res) {
