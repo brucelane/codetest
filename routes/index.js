@@ -27,5 +27,5 @@ module.exports = function( app ) {
 	//**************** 
 	require('./default.js')( app ); 
 	require('./api.js')( app );
-	require('./freeId.js')( app );
+	require('./freeid.js')( app );
 }; 
