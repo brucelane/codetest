@@ -16,6 +16,7 @@
 	}
 ,"scripts" : {
         "start":"node ./app.js &"
-	,"test" : "node_modules/.bin/mocha -A ./tests/unit && node_modules/.bin/mocha -A ./tests/functional"
+	,"stop":"killall -kill node"
+	,"test" : "npm start && node_modules/.bin/mocha -A ./tests/unit && node_modules/.bin/mocha -A ./tests/functional && npm stop"
 	} 
 }
