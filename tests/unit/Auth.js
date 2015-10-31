@@ -49,21 +49,18 @@ describe('FreeId', function() {
 			) 
 		})
 		it('should validate a valid token', function(done) { 
-			authCtrl.tryToSignUser('test', 'secretKey').then(function(token){
+			authCtrl.tryToSignUser('test', 'secretKey', function(token){
 				authCtrl.validateUserToken(token.token, function(err, decodedToken) {
 					done(); 
 				}); 
 			})	
-			.reject(done); 
 		});
 		it('should not generate token if user does not exists', function(done) {
-			var a = authCtrl.tryToSignUser('username', 'secretKey').then(function(token) { 
-					console.log("AAAAAA"); 
+			var a = authCtrl.tryToSignUser('username', 'secretKey', function(token) { 
 					should.exist(err); 
 					err.message.should.equal("User not found");
 					done();  
 			})
-			.reject(function(err){ console.log(err); done(err); }); 
 		}); 
 		it('should not validate an invalid token', function(done) {
 			authCtrl.validateUserToken("123456", function(err, decodedToken) {
