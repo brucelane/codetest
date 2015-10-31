@@ -25,7 +25,7 @@ module.exports = function( app ) {
 	//****************
 	// Routes init ***
 	//**************** 
-	require('./Default.js')( app ); 
-	require('./Api.js')( app );
-	require('./FreeId.js')( app );
+	require('./default.js')( app ); 
+	require('./api.js')( app );
+	require('./freeId.js')( app );
 }; 
