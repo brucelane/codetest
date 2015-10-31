@@ -12,8 +12,7 @@
 	 ,"uuid-lib" : "^0.0.6"
 	 ,"mocha" : "^2.3.2" 
 	 ,"should" : "^7.1.0"
-	 ,"supertest" : "^1.1.0"
-	 ,"sinon" : "^1.17.1"  		
+	 ,"supertest" : "^1.1.0" 		
 	}
 ,"scripts" : {
         "start":"node ./app.js &"

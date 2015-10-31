@@ -3,7 +3,7 @@
 //****************** 
 
 var jsonwtk = require('jsonwebtoken'); 
-var config = require('../config/config.js'); 
+var config = require('../config/Config.js'); 
 var citizenCtrl = require('./Citizen.js'); 
 
 //********************

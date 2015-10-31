@@ -2,23 +2,35 @@
 // Dependencies **** 
 //****************** 
 var should = require('should'); 
-var mongoose = require('mongoose');
-var citizenCtrl = require('../../controllers/Citizen.js'); 
-var citizenModel = mongoose.model('Citizen'); 
-var freeIdCtrl = require('../../controllers/FreeId.js');  
-var authCtrl = require('../../controllers/Auth.js'); 
+// var mongoose = require('mongoose');
+// var citizenCtrl = require('../../controllers/Citizen.js'); 
+// var citizenModel = mongoose.model('Citizen'); 
+// var freeIdCtrl = require('../../controllers/FreeId.js');  
+// var authCtrl = require('../../controllers/Auth.js'); 
 var config = require('../../config/config.js'); 
  
+var citizenCtrl = {}; 
+var citizenModel = {}; 
+var freeIdCtrl = function()  {
+	return {
+		generateNewId: function (cb) {
+			return cb(null, 1);  
+		}
+	}
+}(); 
+var authCtrl = {}; 
+
 //******************* 
 // Test cases ******* 
 //******************* 
 describe('FreeId', function() {
 	before(function(done) {
-		mongoose.connect(config.db_connection); 
+		// mongoose.connect(config.db_connection);
+		console.dir(freeIdCtrl.generateNewId);  
 		done(); 
 	}); 	
 	after(function(done) {
-		mongoose.disconnect(); 
+		// mongoose.disconnect(); 
 		done();
 	});
 	describe('Generate a valid token when a user exists' , function() {
@@ -43,24 +55,27 @@ describe('FreeId', function() {
 			});  
 		}); 
 
-		it('should generate a valid token', function(done) { 
-			 authCtrl.tryToSignUser('test', 'secretKey',  
-				function(citizen) { return done(); }
-			) 
-		})
+		it('should generate a valid token', function(done) {
+			authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {	
+				if (err) return done(err); 
+				done(); 
+			}); 
+		});
 		it('should validate a valid token', function(done) { 
-			authCtrl.tryToSignUser('test', 'secretKey', function(token){
+			authCtrl.tryToSignUser('test', 'secretKey', function(err, token) {
+					if (err) return done(err); 
 				authCtrl.validateUserToken(token.token, function(err, decodedToken) {
+					if(err) return done(err); 
 					done(); 
 				}); 
-			})	
+			}); 
 		});
 		it('should not generate token if user does not exists', function(done) {
-			var a = authCtrl.tryToSignUser('username', 'secretKey', function(token) { 
+			authCtrl.tryToSignUser('username', 'secretKey', function(err, token) { 
 					should.exist(err); 
 					err.message.should.equal("User not found");
 					done();  
-			})
+			});
 		}); 
 		it('should not validate an invalid token', function(done) {
 			authCtrl.validateUserToken("123456", function(err, decodedToken) {
